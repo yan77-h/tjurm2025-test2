@@ -31,5 +31,32 @@ std::unordered_map<int, cv::Rect> roi_color(const cv::Mat& input) {
     std::unordered_map<int, cv::Rect> res;
     // IMPLEMENT YOUR CODE HERE
 
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+
+    cv::Mat gray;
+    cv::cvtColor(input, gray, cv::COLOR_BGR2GRAY);
+    cv::Mat binary;
+    cv::threshold(gray, binary, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);//二值化
+
+    cv::findContours(binary, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);//找矩形
+
+     for (size_t i = 0; i < contours.size(); i++) {
+        cv::Rect rect = cv::boundingRect(contours[i]);//转换成矩形
+
+        cv::Mat roi = input(rect);//得到roi区域
+
+        cv::Scalar meanColor = cv::mean(roi);//得到roi颜色
+
+        // 根据颜色的统计值来判断颜色，并存储到 map 中
+        if (meanColor[2] > meanColor[1] && meanColor[2] > meanColor[0]) { // Red
+            res[2] = rect;
+        } else if (meanColor[1] > meanColor[2] && meanColor[1] > meanColor[0]) { // Green
+            res[1] = rect;
+        } else { // Blue
+            res[0] = rect;
+        }
+    }
+
     return res;
 }

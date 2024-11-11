@@ -44,8 +44,22 @@ std::vector<cv::Mat> erode(const cv::Mat& src_erode, const cv::Mat& src_dilate) 
      *     以上两个检查点需要自己检查，满足条件 则输入 p 通过, 否则输入 f 表示不通过
      */
     cv::Mat dst_erode, dst_dilate;
+    cv::Mat gray_erode, gray_dilate;
+    cv::Mat binary_erode, binary_dilate;
 
     // TODO: 在这里实现你的代码
+
+    cv::cvtColor(src_erode, gray_erode, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(src_dilate, gray_dilate, cv::COLOR_BGR2GRAY);//转换为灰度图像
+
+    cv::threshold(gray_erode, binary_erode, 50, 255, cv::THRESH_BINARY);
+    cv::threshold(gray_dilate, binary_dilate, 50, 255, cv::THRESH_BINARY);//转换为二值
+
+    cv::Mat elment = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(8, 8));//3x3矩形核
+
+    cv::erode(binary_erode, dst_erode, elment);//腐蚀
+
+    cv::dilate(binary_dilate, dst_dilate, elment);//膨胀
 
     return {dst_erode, dst_dilate};
 }
