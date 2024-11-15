@@ -17,11 +17,11 @@ float compute_area_ratio(const std::vector<cv::Point>& contour) {
 
      double contour_area = cv::contourArea(contour);//轮廓的面积
 
-     cv::Rect bounding_rect = cv::boundingRect(contour);//外接矩形
+     cv::RotatedRect bounding_rect = cv::minAreaRect(contour);//最小外接矩形.boundingRect是水平矩形,minArea可以倾斜
 
-     double rect_area = bounding_rect.width * bounding_rect.height;//外接矩形面积
+     double rect_area = bounding_rect.size.width * bounding_rect.size.height;//外接矩形面积
 
-     float area_ratio = static_cast<float>(contour_area) / rect_area;
+     double area_ratio = static_cast<float>(contour_area) / rect_area;
 
     return area_ratio;
 }
